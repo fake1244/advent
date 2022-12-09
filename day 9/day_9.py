@@ -84,45 +84,23 @@ def part1(moves):
 
 
 def part2(moves):
-    rope = [(0,0) for _ in range(10)]
-    visited = set()
+    N = 1000
+    visited = [[False for i in range(0, N)]  for _ in range(0, N)]
+    head = [200, 200]
+    tails = [[200, 200] for _ in range(9)]
+    visited[tails[0][0]][tails[0][1]] = True
     for move in moves.splitlines():
         dir, count = move.split(' ')
-        for step in range(int(count)):
-            if dir == 'R':
-                rope[0] = (rope[0][0], rope[0][1] + 1)
-            if dir == 'L':
-                rope[0] = (rope[0][0], rope[0][1] - 1)
-            if dir == 'U':
-                rope[0] = (rope[0][0] + 1, rope[0][1])
-            if dir == 'D':
-               rope[0] = (rope[0][0] - 1, rope[0][1])
-        
-            for i in range(1, len(rope)):
-                if rope[i - 1][0] - rope[i][0] > 1:
-                    if rope[i - 1][1] - rope[i][1] > 1:
-                        rope[i] = (rope[i - 1][0] - 1, rope[i - 1][1] - 1)
-                    elif rope[i - 1][1] - rope[i][1] < -1:
-                        rope[i] = (rope[i - 1][0] - 1, rope[i - 1][1] + 1)
-                    else:
-                        rope[i] = (rope[i - 1][0] - 1, rope[i - 1][1])
-                elif rope[i - 1][0] - rope[i][0] < -1:
-                    if rope[i - 1][1] - rope[i][1] > 1:
-                        rope[i] = (rope[i - 1][0] + 1, rope[i - 1][1] - 1)
-                    elif rope[i - 1][1] - rope[i][1] < -1:
-                        rope[i] = (rope[i - 1][0] + 1, rope[i - 1][1] + 1)
-                    else:
-                        rope[i] = (rope[i - 1][0] + 1, rope[i - 1][1])
-                elif rope[i - 1][1] - rope[i][1] > 1:
-                    rope[i] = (rope[i - 1][0], rope[i - 1][1] - 1)
-                elif rope[i - 1][1] - rope[i][1] < -1:
-                    rope[i] = (rope[i - 1][0], rope[i - 1][1] + 1)
-            visited.add(rope[-1])
-            
+        count = int(count)
+        for i in range(0, count):
+            head = move_head(head, dir)
+            tails[0] = move_tail(head, tails[0], dir)
+            for i in range(1, len(tails)):
+                tails[i] = move_tail(tails[i - 1], tails[i], dir)
+            visited[tails[-1][0]][tails[-1][1]] = True
 
-
-    # print(sorted(list(visited)))
-    print(f"Part 2: {len(visited)}")
+    res_sum = sum([sum(line) for line in visited])
+    print(f"Part 2: {res_sum}")
 
 
 

@@ -84,74 +84,45 @@ def part1(moves):
 
 
 def part2(moves):
-    def move_tail(head, tail, dir, space):
-        if abs(head[0] - tail[0]) < space and abs(head[1] - tail[1]) < space:
-            return tail
-
-        if head[0] != tail[0] and head[1] != tail[1]:
-            if dir == 'R':
-                move = 0
-                if head[0] - tail[0] > 0:
-                    move = 1
-                else:
-                    move = -1
-                tail[0] += move
-                tail[1] += 1
-            elif dir == 'L':
-                move = 0
-                if head[0] - tail[0] > 0:
-                    move = 1
-                else:
-                    move = -1
-                tail[0] += move
-                tail[1] -= 1
-            elif dir == 'U':
-                move = 0
-                if head[1] - tail[1] > 0:
-                    move = 1
-                else:
-                    move = -1
-                tail[0] += 1
-                tail[1] += move
-            elif dir == 'D':
-                move = 0
-                if head[1] - tail[1] > 0:
-                    move = 1
-                else:
-                    move = -1
-                tail[0] -= 1
-                tail[1] += move
-        else:
-            if dir == 'R':
-                tail[1] += 1
-            elif dir == 'L':
-                tail[1] -= 1
-            elif dir == 'U':
-                tail[0] += 1
-            elif dir == 'D':
-                tail[0] -= 1
-        return tail
-    
-    N = 2000
-    res_grid = [[False for i in range(0, N)]  for _ in range(0, N)]
-    head = [100, 100]
-    tails = [[100, 100] for i in range(0, 9)]
-    res_grid[100][100] = True
+    rope = [(0,0) for _ in range(10)]
+    visited = set()
     for move in moves.splitlines():
         dir, count = move.split(' ')
-        count = int(count)
-        for i in range(0, count):
-            head = move_head(head, dir)
-            for (j, tail) in enumerate(tails):
-                tail = move_tail(head, tail, dir, j + 1)
-            res_grid[tails[-1][0]][tails[-1][1]] = True
-            # for line in reversed(res_grid):
-            #     print(line)
-    
-    # for line in reversed(res_grid):
-    #     print(line)
-    res_sum = sum([sum(line) for line in res_grid])
-    print(f"Part 2: {res_sum}")
+        for step in range(int(count)):
+            if dir == 'R':
+                rope[0] = (rope[0][0], rope[0][1] + 1)
+            if dir == 'L':
+                rope[0] = (rope[0][0], rope[0][1] - 1)
+            if dir == 'U':
+                rope[0] = (rope[0][0] + 1, rope[0][1])
+            if dir == 'D':
+               rope[0] = (rope[0][0] - 1, rope[0][1])
+        
+            for i in range(1, len(rope)):
+                if rope[i - 1][0] - rope[i][0] > 1:
+                    if rope[i - 1][1] - rope[i][1] > 1:
+                        rope[i] = (rope[i - 1][0] - 1, rope[i - 1][1] - 1)
+                    elif rope[i - 1][1] - rope[i][1] < -1:
+                        rope[i] = (rope[i - 1][0] - 1, rope[i - 1][1] + 1)
+                    else:
+                        rope[i] = (rope[i - 1][0] - 1, rope[i - 1][1])
+                elif rope[i - 1][0] - rope[i][0] < -1:
+                    if rope[i - 1][1] - rope[i][1] > 1:
+                        rope[i] = (rope[i - 1][0] + 1, rope[i - 1][1] - 1)
+                    elif rope[i - 1][1] - rope[i][1] < -1:
+                        rope[i] = (rope[i - 1][0] + 1, rope[i - 1][1] + 1)
+                    else:
+                        rope[i] = (rope[i - 1][0] + 1, rope[i - 1][1])
+                elif rope[i - 1][1] - rope[i][1] > 1:
+                    rope[i] = (rope[i - 1][0], rope[i - 1][1] - 1)
+                elif rope[i - 1][1] - rope[i][1] < -1:
+                    rope[i] = (rope[i - 1][0], rope[i - 1][1] + 1)
+            visited.add(rope[-1])
+            
+
+
+    # print(sorted(list(visited)))
+    print(f"Part 2: {len(visited)}")
 
 
 
@@ -166,5 +137,5 @@ if __name__ == '__main__':
     part1(test)
     part2(test2)
     print("Real puzzle")
-    # part1(input)
-    # part2(directory_input)
+    part1(input)
+    part2(input)

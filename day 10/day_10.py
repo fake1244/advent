@@ -31,7 +31,7 @@ def part2(commands, m):
             if j == pos or j == pos + 1 or j == pos + 2:
                 screen += '#'
             else:
-                screen += '.'
+                screen += ' '
         screen += '\n'
     print(screen)
 

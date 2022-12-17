@@ -1,64 +1,71 @@
+import math
 
-def find_start_end(puzzle):
+def part1(input, begin=None, toPrint = False):
+    puzzle = []
     start = None
     end = None
-    for r in range(len(puzzle)):
-        for c in range(len(puzzle[r])):
-            if puzzle[r][c] == 'S':
-                start = (r, c)
-                # puzzle[r][c] = 'a'
-            if puzzle[r][c] == 'E':
-                end = (r, c)
-                # puzzle[r][c] = 'z'
-    return start, end
-
-def heuristic(curr, end):
-    return abs(curr[0] - end[0]) + abs(curr[1] - end[1])
-
-def add_move(curr, test, cost, end, queue, MAX, puzzle):
-    if test[0] < 0 or test[1] < 0 or test[0] >= MAX or test[1] >= MAX:
-        return
-    now = puzzle[curr[0]][curr[1]]
-    print(test, MAX)
-    next = puzzle[test[0]][test[1]]
-    if now == 'S':
-        now = 'a'
-    if now == 'E':
-        now = 'z'
-
-    print(f"ord now {ord(now)} ord next {ord(next)}")
-    if ord(now) + 1 >= ord(next): 
-        queue.append((test, cost, heuristic(test, end)))
-    return
-
-def part1(input):
-    puzzle = input.splitlines()
-    # print(puzzle[1][1])
+    for i, line in enumerate(input.splitlines()):
+        row = []
+        for j, char in enumerate(line):
+            if char == 'S':
+                start = (i, j)
+                row.append(ord('a'))
+                continue
+            if char == 'E':
+                end = (i, j)
+                row.append(ord('z'))
+                continue
+            row.append(ord(char))
+        puzzle.append(row)
+    if begin:
+        start = begin
     visited = set()
-    start, end = find_start_end(puzzle)
-    queue = [(start, 0, heuristic(start, end))]
-    print(start, end)
-    print(queue)
-    MAX = len(puzzle)
+    queue = [(start, 0)]
     while queue:
-        move, cost, _  = queue.pop(0) # start of q
-        if (move[0], move[1]) in visited:
+        move, cost = queue.pop(0)
+        if move in visited:
             continue
-        print(move in visited)
-        visited.add((move[0],move[1]))
+        visited.add(move)
+
         if move == end:
-            print("Part 1: ", cost)
-            return
-        add_move(move ,(move[0] - 1, move[1]), cost + 1, end, queue, MAX, puzzle)
-        add_move(move ,(move[0] + 1, move[1]), cost + 1, end, queue, MAX, puzzle)
-        add_move(move ,(move[0], move[1] - 1), cost + 1, end, queue, MAX, puzzle)
-        add_move(move ,(move[0], move[1] + 1), cost + 1, end, queue, MAX, puzzle)
-        queue.sort(key= lambda x: x[1] + x[2])
-        print(queue)
-    # print(ord('a'))
-    print("error")
+            if toPrint:
+                print("Part 1: ", cost)
+            return cost
+        add_moves(move, queue, puzzle, cost)
+        queue.sort(key=lambda x: x[1])
+
+    return math.inf
+
+
+def is_valid(move, max_x, max_y):
+    if 0 <= move[0] < max_x and 0 <= move[1] < max_y:
+        return True
+    return False
+
+
+def add_moves(move, queue, puzzle, cost):
+    moves = [(move[0] + 1, move[1]), (move[0], move[1] + 1), (move[0] - 1, move[1]), (move[0], move[1] - 1)]
+    max_x = len(puzzle)
+    max_y = len(puzzle[move[0]])
+    for test in moves:
+        if not is_valid(test, max_x, max_y):
+            continue
+        
+        if puzzle[test[0]][test[1]] - puzzle[move[0]][move[1]] <= 1:
+            queue.append((test, cost + 1))
+
 
 def part2(input):
+    posibilities = []
+    for i, line in enumerate(input.splitlines()):
+        for j, c in enumerate(line):
+            if c == 'a':
+                posibilities.append((i, j))
+    res = [part1(input, toPrint=False)]
+    for pos in posibilities:
+        res.append(part1(input, begin=pos, toPrint=False))
+
+    print("Part 2: ", min(res))
     pass
 
 
@@ -66,8 +73,8 @@ if __name__ == '__main__':
     test = open('./day 12/test.txt', 'r').read()
     input = open('./day 12/input.txt', 'r').read()
     print("Test")
-    part1(test)
+    part1(test, toPrint=True)
     part2(test)
-    # print("Real puzzle")
-    # part1(input)
-    # part2(input)
+    print("Real puzzle")
+    part1(input, toPrint=True)
+    part2(input)

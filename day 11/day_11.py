@@ -152,12 +152,6 @@ def part2(commands):
 
 
 if __name__ == '__main__':
-    # test = open('./day 11/test.txt', 'r').read()
-    # test2 = open('./day 9/test2.txt', 'r').read()
-    # input = open('./day 11/input.txt', 'r').read()
-    # print("Test")
-    # part1(test)
-    # part2(test)
     print("Real puzzle")
     part1(input)
     part2(input)
